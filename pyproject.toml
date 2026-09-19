@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "absorber"
+version = "0.1.0"
+description = "Tray app that turns whatever is in the clipboard into a real file and hands the path back."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Lukas Geiger" }]
+keywords = ["clipboard", "tray", "file", "pyside6", "desktop", "local-first"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: X11 Applications :: Qt",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Desktop Environment :: File Managers",
+    "Topic :: Utilities",
+]
+dependencies = ["PySide6>=6.6"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.gui-scripts]
+absorber = "absorber.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/file-bricks/absorber"
+Issues = "https://github.com/file-bricks/absorber/issues"
+
+[tool.setuptools.packages.find]
+include = ["absorber*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

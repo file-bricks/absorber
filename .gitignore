@@ -1,0 +1,124 @@
+# =============================================================================
+# .gitignore Template für Software Entwicklung Projekte
+# Kopieren und als .gitignore im Projektroot ablegen
+# Projektspezifische Einträge am Ende anfügen
+# =============================================================================
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+.eggs/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# ---- Virtuelle Umgebungen ----
+venv/
+.venv/
+env/
+.env/
+
+# ---- JavaScript / Browser-Extensions ----
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# ---- BACH Interne Steuerungsdateien (NIEMALS in Git!) ----
+AUFGABEN.txt
+AUFGABEN.md
+TODO.md
+TODO.txt
+DONE.md
+DONE.txt
+ERLEDIGT.txt
+LOCK.txt
+LOCK.*.txt
+LOCK-CACHE.md
+TEST.txt
+TESTS.txt
+TESTERGEBNISSE.txt
+BUGREPORT.md
+BUGS.md
+SOLVED.md
+DIAGNOSE_REPORT.md
+DECISIONS.md
+PORTIERUNGSPLAN.md
+STORE_READINESS.md
+SKILL.md
+tmpclaude-*
+
+# ---- Persoenliche / Sensible Daten ----
+_USER/
+.env
+.env.*
+credentials.json
+client_secret*.json
+token.json
+*.pem
+*.key
+*.pfx
+*.p12
+*.cer
+*.crt
+keyring/
+*.db
+*.sqlite
+*.sqlite3
+*.db-wal
+*.db-shm
+
+# ---- Build-Artefakte & Releases ----
+releases/
+*.exe
+*.msi
+*.msix
+*.appx
+*.zip
+*.7z
+*.tar.gz
+*.dmg
+*.pkg
+*.AppImage
+*.apk
+*.aab
+*.ipa
+*.spec
+logs/
+*.log
+Output/
+output/
+downloads/
+artifacts/
+*.tmp
+*.bak
+*_bak/
+_tmp/
+
+# ---- IDE & Editoren ----
+.claude/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---- Betriebssystem ----
+desktop.ini
+Thumbs.db
+.DS_Store
+ehthumbs.db
+
+# ---- Projektspezifisch (hier eigene Einträge anfügen) ----
+
+# absorber
+config.json
+*.png
+!docs/*.png

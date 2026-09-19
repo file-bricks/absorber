@@ -1,0 +1,7 @@
+* text=auto
+
+# Shell scripts must keep LF, otherwise the shebang breaks on Linux/macOS.
+*.sh text eol=lf
+# Batch files are the mirror case: Windows wants CRLF.
+*.bat text eol=crlf
+*.png binary
