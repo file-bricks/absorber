@@ -145,7 +145,7 @@ pip install -e ".[dev]"
 QT_QPA_PLATFORM=offscreen pytest
 ```
 
-91 tests, no network access, no real clipboard required. The core is deliberately free of
+93 tests, no network access, no real clipboard required. The core is deliberately free of
 GUI imports:
 
 | Module | Responsibility |

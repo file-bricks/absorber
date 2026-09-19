@@ -64,6 +64,26 @@ def test_window_opens_with_canvas_and_status(qapp):
     window.close()
 
 
+def test_ctrl_v_is_wired_to_absorbing(qapp):
+    """A paste shortcut is easy to build so that it type-checks but never fires.
+    Assert the binding and that triggering it actually reaches the callback."""
+    calls = []
+    window = AbsorberWindow(lambda: calls.append(1))
+    assert window.paste_shortcut.key().toString() == "Ctrl+V"
+    assert window.paste_shortcut.isEnabled()
+    window.paste_shortcut.activated.emit()
+    assert calls == [1]
+
+
+def test_context_menu_paste_is_wired_to_absorbing(qapp):
+    calls = []
+    window = AbsorberWindow(lambda: calls.append(1))
+    entries = [a for a in window.build_context_menu().actions() if a.text() == "Einfügen"]
+    assert len(entries) == 1
+    entries[0].trigger()
+    assert calls == [1]
+
+
 def test_window_close_hides_instead_of_destroying(qapp):
     window = AbsorberWindow(lambda: None)
     window.show()

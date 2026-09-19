@@ -30,6 +30,7 @@ def test_add_moves_a_repeat_to_the_front(tmp_path):
 
 def test_add_caps_the_list(tmp_path):
     store = tmp_path / "recent.json"
+    entries: list[str] = []
     for i in range(15):
         entries = recent.add([f"f{i}"], limit=10, store=store)
     assert len(entries) == 10

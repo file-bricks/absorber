@@ -4,6 +4,26 @@ Alle nennenswerten Änderungen an diesem Projekt werden hier festgehalten.
 Das Format folgt [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
+## [Unreleased]
+
+### Behoben
+
+- Der `QShortcut` für Strg+V wurde mit einer `StandardKey` statt einer
+  `QKeySequence` und einem `activated=`-Schlüsselwort gebaut. Zur Laufzeit
+  funktionierte das, es traf aber keine dokumentierte Überladung — eine Form,
+  die sich leicht so schreiben lässt, dass sie richtig aussieht und trotzdem nie
+  auslöst. Jetzt explizit gebaut und verbunden, mit einem Test, der die Bindung
+  **und** das Auslösen belegt.
+- Das Kontextmenü wurde im selben Schritt gebaut und per `exec()` angezeigt.
+  Das Bauen war dadurch nicht prüfbar, ohne den Test zu blockieren;
+  `build_context_menu()` ist jetzt für sich testbar.
+- In einem Test war `entries` formal ungebunden, falls die Schleife nicht liefe.
+
+### Hinzugefügt
+
+- Je ein Test für die beiden Auslöser des Einfügens (Strg+V und Kontextmenü),
+  damit 93 statt 91 Tests. Pyright meldet über Paket und Tests 0 Fehler.
+
 ## [0.1.0] - 2026-09-20
 
 Erste Fassung. Zwischenablage hinein, Datei heraus, Pfad zurück.

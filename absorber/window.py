@@ -81,14 +81,19 @@ class AbsorberWindow(QWidget):
         self._status_timer.setSingleShot(True)
         self._status_timer.timeout.connect(lambda: self.report(""))
 
-        QShortcut(QKeySequence.StandardKey.Paste, self, activated=self._absorb)
+        self.paste_shortcut = QShortcut(QKeySequence(QKeySequence.StandardKey.Paste), self)
+        self.paste_shortcut.activated.connect(self._absorb)
 
-    def _show_menu(self, position):
+    def build_context_menu(self) -> QMenu:
+        """Built separately from showing it, because exec() blocks and cannot be tested."""
         menu = QMenu(self)
         paste = QAction("Einfügen", menu)
         paste.triggered.connect(self._absorb)
         menu.addAction(paste)
-        menu.exec(self.mapToGlobal(position))
+        return menu
+
+    def _show_menu(self, position):
+        self.build_context_menu().exec(self.mapToGlobal(position))
 
     def flash(self, kind: str) -> None:
         """Show the kind symbol, then shrink and fade it out."""
