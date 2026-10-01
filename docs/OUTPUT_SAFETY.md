@@ -2,10 +2,17 @@
 
 Absorber schreibt Text, Markdown, HTML, Bilder und Dateikopien zunächst in eine
 exklusiv angelegte temporäre Datei im Zielordner. Erst nach erfolgreichem Schreiben
-reserviert es den endgültigen Namen mit `O_CREAT | O_EXCL`. Ist der Name schon
+reserviert es den endgültigen Namen exklusiv. Unter Unix geschieht dies mit
+`O_CREAT | O_EXCL`. Ist der Name schon
 belegt, folgen wie bisher `_2`, `_3` usw. Auch ein defekter symbolischer Link zählt
 als belegter Name. Die bisherige Funktion `naming.unique_path` bleibt eine reine
 Namensvorhersage; sie reserviert keine Datei.
+
+Unter Windows verwendet die Reservierung `CreateFileW` mit `CREATE_NEW` und
+`FILE_FLAG_OPEN_REPARSE_POINT`, da die Windows-CRT bei `O_EXCL` defekten Links
+folgen kann. Das eigene Windows-Handle wird nach erfolgreichem Anlegen in einen
+Python-Dateideskriptor überführt; schlägt diese Überführung fehl, wird das Handle
+geschlossen. Die bisherigen Identitäts- und Bereinigungsprüfungen gelten auch hier.
 
 Vor der Veröffentlichung prüft Absorber, ob temporäre Datei und Reservierung noch
 die beim Anlegen über den eigenen Dateideskriptor erfasste Identität besitzen.

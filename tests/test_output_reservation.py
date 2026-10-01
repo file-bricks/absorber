@@ -163,11 +163,11 @@ def test_foreign_replacement_of_reservation_is_preserved(cfg, tmp_path, monkeypa
     original = tmp_path / "foreign-original.bin"
     original.write_bytes(b"foreign-original")
     expected = target / "reserved.txt"
-    original_open, original_close = os.open, os.close
+    original_open, original_close = core._exclusive_file, os.close
     descriptor = set()
-    def opened(path, flags, *args, **kwargs):
-        fd = original_open(path, flags, *args, **kwargs)
-        if Path(path) == expected and flags & os.O_EXCL:
+    def opened(path):
+        fd = original_open(path)
+        if Path(path) == expected:
             descriptor.add(fd)
         return fd
     def closed(fd):
@@ -177,7 +177,7 @@ def test_foreign_replacement_of_reservation_is_preserved(cfg, tmp_path, monkeypa
             expected.unlink()
             os.link(original, expected)
     monkeypatch.setattr(core, "build_stem", lambda *a: "reserved")
-    monkeypatch.setattr(core.os, "open", opened)
+    monkeypatch.setattr(core, "_exclusive_file", opened)
     monkeypatch.setattr(core.os, "close", closed)
     with pytest.raises(OSError):
         core.materialize(FakeMime(text="synthetic"), cfg)
@@ -266,15 +266,45 @@ def test_cleanup_and_error_reporting_failure_do_not_mask_write_error(cfg, monkey
 
 def test_reservation_permission_denial_is_not_assumed_collision(cfg, monkeypatch):
     target = Path(cfg["target_dir"])
-    original_open = os.open
+    original_open = core._exclusive_file
     error = PermissionError("reservation forbidden")
     monkeypatch.setattr(core, "build_stem", lambda *a: "same")
     def opened(path, *args, **kwargs):
         if Path(path) == target / "same.txt":
             raise error
         return original_open(path, *args, **kwargs)
-    monkeypatch.setattr(core.os, "open", opened)
+    monkeypatch.setattr(core, "_exclusive_file", opened)
     with pytest.raises(PermissionError) as caught:
         core.materialize(FakeMime(text="synthetic"), cfg)
     assert caught.value is error
     assert list(target.iterdir()) == []
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Native Windows handle transfer")
+def test_failed_native_descriptor_transfer_closes_own_handle(tmp_path, monkeypatch):
+    import ctypes
+    import msvcrt
+    from ctypes import wintypes
+    from types import SimpleNamespace
+
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+    kernel.CloseHandle.restype = wintypes.BOOL
+    closed, transferred = [], []
+    error = OSError("synthetic descriptor transfer error")
+    def close(handle):
+        result = kernel.CloseHandle(handle)
+        closed.append((handle, bool(result)))
+        return result
+    def fail_transfer(handle, flags):
+        transferred.append(handle)
+        raise error
+    wrapper = SimpleNamespace(CreateFileW=kernel.CreateFileW, CloseHandle=close)
+    with monkeypatch.context() as patch:
+        patch.setattr(ctypes, "WinDLL", lambda *a, **k: wrapper)
+        patch.setattr(msvcrt, "open_osfhandle", fail_transfer)
+        with pytest.raises(OSError) as caught:
+            core._exclusive_file(tmp_path / "own-reservation.txt")
+    assert caught.value is error
+    assert len(transferred) == 1
+    assert closed == [(transferred[0], True)]

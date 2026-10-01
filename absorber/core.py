@@ -112,6 +112,35 @@ def _remove_owned(path: Path, identity: os.stat_result) -> None:
         pass
 
 
+def _exclusive_file(path: Path) -> int:
+    if os.name != "nt":
+        return os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    # The Windows CRT follows dangling symlinks even with O_EXCL. CREATE_NEW
+    # together with OPEN_REPARSE_POINT reserves the directory entry itself.
+    import ctypes
+    import msvcrt
+    from ctypes import wintypes
+
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    create = kernel.CreateFileW
+    create.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD,
+                       wintypes.LPVOID, wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE]
+    create.restype = wintypes.HANDLE
+    handle = create(os.path.abspath(path), 0x40000000, 0x7, None, 1,
+                    0x80 | 0x00200000, None)
+    if handle == ctypes.c_void_p(-1).value:
+        raise ctypes.WinError(ctypes.get_last_error())
+    try:
+        # A successful conversion transfers handle ownership to the descriptor.
+        return msvcrt.open_osfhandle(handle, os.O_WRONLY | os.O_BINARY)
+    except BaseException:
+        close = kernel.CloseHandle
+        close.argtypes = [wintypes.HANDLE]
+        close.restype = wintypes.BOOL
+        close(handle)
+        raise
+
+
 def _write_unique(directory: Path, stem: str, extension: str,
                   write: Callable[[Path], object]) -> Path:
     """Write privately, then replace only an exclusively reserved output name."""
@@ -136,7 +165,7 @@ def _write_unique(directory: Path, stem: str, extension: str,
             suffix = "" if counter == 1 else f"_{counter}"
             candidate = directory / f"{stem}{suffix}.{extension}"
             try:
-                fd = os.open(candidate, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+                fd = _exclusive_file(candidate)
             except FileExistsError:
                 counter += 1
                 continue
