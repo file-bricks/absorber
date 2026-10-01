@@ -282,6 +282,8 @@ def test_reservation_permission_denial_is_not_assumed_collision(cfg, monkeypatch
 
 @pytest.mark.skipif(os.name != "nt", reason="Native Windows handle transfer")
 def test_failed_native_descriptor_transfer_closes_own_handle(tmp_path, monkeypatch):
+    if os.name != "nt":
+        pytest.skip("Native Windows handle transfer")
     import ctypes
     import msvcrt
     from ctypes import wintypes
