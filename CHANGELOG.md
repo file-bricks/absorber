@@ -8,6 +8,12 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Behoben
 
+- Gleichzeitige Speicherungen konnten denselben vermeintlich freien Dateinamen
+  wählen und sich überschreiben. Text, Markdown, HTML, Bilder und Dateikopien
+  werden jetzt zunächst privat geschrieben und anschließend unter einem exklusiv
+  reservierten Namen veröffentlicht. Fehler bereinigen nur Dateien mit eigener
+  nachgewiesener Identität; vorhandene Dateien erhalten weiterhin `_2`, `_3` usw.
+
 - Der `QShortcut` für Strg+V wurde mit einer `StandardKey` statt einer
   `QKeySequence` und einem `activated=`-Schlüsselwort gebaut. Zur Laufzeit
   funktionierte das, es traf aber keine dokumentierte Überladung — eine Form,
