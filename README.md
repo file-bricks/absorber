@@ -1,3 +1,5 @@
+<img src="assets/banner.png" width="100%" alt="Absorber Banner">
+
 # Absorber
 
 **English** | [Deutsch](README_de.md)

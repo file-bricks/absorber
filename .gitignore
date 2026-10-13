@@ -122,3 +122,4 @@ ehthumbs.db
 config.json
 *.png
 !docs/*.png
+!assets/banner.png
