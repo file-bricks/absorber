@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "absorber"
-version = "0.1.0"
+version = "0.1.1"
 description = "Tray app that turns whatever is in the clipboard into a real file and hands the path back."
 readme = "README.md"
 requires-python = ">=3.11"

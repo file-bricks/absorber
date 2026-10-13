@@ -6,6 +6,8 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-13
+
 ### Behoben
 
 - Gleichzeitige Speicherungen konnten denselben vermeintlich freien Dateinamen
@@ -29,6 +31,9 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 - Je ein Test für die beiden Auslöser des Einfügens (Strg+V und Kontextmenü),
   damit 93 statt 91 Tests. Pyright meldet über Paket und Tests 0 Fehler.
+- CI prüft zusätzlich mit Pyright, damit reine Stub-Fehler nicht mehr
+  durchrutschen.
+- Banner im Kopf von `README.md` und `README_de.md`.
 
 ## [0.1.0] - 2026-09-20
 
@@ -63,4 +68,6 @@ Erste Fassung. Zwischenablage hinein, Datei heraus, Pfad zurück.
   Statuszeile elidiert jetzt in der Mitte und treibt die Fensterbreite nicht
   mehr; der vollständige Pfad steht im Tooltip.
 
+[Unreleased]: https://github.com/file-bricks/absorber/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/file-bricks/absorber/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/file-bricks/absorber/releases/tag/v0.1.0
