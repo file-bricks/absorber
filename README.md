@@ -147,7 +147,7 @@ pip install -e ".[dev]"
 QT_QPA_PLATFORM=offscreen pytest
 ```
 
-93 tests, no network access, no real clipboard required. The core is deliberately free of
+115 tests, no network access, no real clipboard required. The core is deliberately free of
 GUI imports:
 
 | Module | Responsibility |
@@ -171,4 +171,5 @@ Deliberately left out of 0.1.0:
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE). Third-party components (PySide6/Qt, LGPL-3.0) are listed in
+[THIRD_PARTY_LICENSES.txt](THIRD_PARTY_LICENSES.txt).

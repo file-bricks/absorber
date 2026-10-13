@@ -1,0 +1,52 @@
+# Third-Party Licenses
+
+Project: Absorber
+Checked: 2026-10-13
+
+Project license:
+- Absorber is licensed under MIT according to `LICENSE`.
+
+Scope:
+- This inventory covers the direct Python runtime dependency declared in
+  `requirements.txt` / `pyproject.toml` and the transitive runtime packages
+  resolved in the checked environment on 2026-10-13.
+- Package versions and license metadata were read from the installed package
+  metadata (`importlib.metadata`) on 2026-10-13.
+- Absorber is distributed as source only. It bundles no third-party code,
+  fonts, images or models. `assets/banner.png` and `docs/window.png` are
+  project artwork and screenshots.
+- Optional: Absorber can talk to a locally running Ollama server over HTTP
+  (`127.0.0.1:11434`) for file-name suggestions. Ollama and its models are
+  installed separately by the user and are not part of this project.
+- This file is not a frozen transitive SBOM. Before a binary or Store release,
+  regenerate a complete inventory from the exact resolved build environment.
+
+## Direct Python Runtime Dependencies
+
+| Package | Requirement | Checked environment version | License metadata | Source |
+|---|---|---:|---|---|
+| PySide6 | `PySide6>=6.6` | 6.11.1 | LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only | https://pypi.org/project/PySide6/ |
+
+## Resolved Transitive Runtime Dependencies
+
+| Package | Required by | Checked environment version | License metadata | Source |
+|---|---|---:|---|---|
+| PySide6_Essentials | PySide6 | 6.11.1 | LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only | https://pypi.org/project/PySide6-Essentials/ |
+| PySide6_Addons | PySide6 | 6.11.1 | LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only | https://pypi.org/project/PySide6-Addons/ |
+| shiboken6 | PySide6 | 6.11.1 | LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only | https://pypi.org/project/shiboken6/ |
+
+## Development Dependencies (not shipped)
+
+| Package | Requirement | Role |
+|---|---|---|
+| pytest | `pytest>=8.0` | test runner (`.[dev]`) |
+| pyright | `pyright>=1.1.400` | type check in CI (`.[dev]`) |
+
+Release notes:
+
+- Preserve upstream license files and notices bundled inside installed wheels
+  and source distributions.
+- For LGPL Qt distribution, keep the Qt libraries replaceable and ship the
+  applicable license notices with binary releases.
+- Re-run this inventory whenever `requirements.txt`, `pyproject.toml` or the
+  frozen build environment changes.

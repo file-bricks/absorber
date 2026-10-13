@@ -153,7 +153,7 @@ pip install -e ".[dev]"
 QT_QPA_PLATFORM=offscreen pytest
 ```
 
-93 Tests, ohne Netzzugriff und ohne echte Zwischenablage. Der Kern ist bewusst frei von
+115 Tests, ohne Netzzugriff und ohne echte Zwischenablage. Der Kern ist bewusst frei von
 GUI-Importen:
 
 | Modul | Zuständigkeit |
@@ -177,4 +177,5 @@ Bewusst nicht in 0.1.0 enthalten:
 
 ## Lizenz
 
-MIT — siehe [LICENSE](LICENSE).
+MIT — siehe [LICENSE](LICENSE). Drittkomponenten (PySide6/Qt, LGPL-3.0) stehen in
+[THIRD_PARTY_LICENSES.txt](THIRD_PARTY_LICENSES.txt).
