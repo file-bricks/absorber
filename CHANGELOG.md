@@ -6,6 +6,13 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Geändert
+
+- CI-Matrix um Python 3.13 erweitert (Ubuntu, Windows, macOS).
+- PEP-621-Metadaten in `pyproject.toml` um Python 3.13 Classifier, Projekt-URLs (Repository, Changelog) und Linter-Konfiguration (`[tool.ruff]`) ergänzt.
+- Vertragstest (`tests/test_contract.py`) für PEP 621 Metadaten, Versionsparität, Lizenzdateien und Konfigurationsvertrag hinzugefügt; Testzahl von 115 auf 119 gestiegen.
+- Linter-Prüfung (`ruff check absorber tests`) in CI-Workflow integriert.
+
 ## [0.1.1] - 2026-10-13
 
 ### Behoben
