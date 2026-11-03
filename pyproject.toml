@@ -18,20 +18,23 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Desktop Environment :: File Managers",
     "Topic :: Utilities",
 ]
 dependencies = ["PySide6>=6.6"]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0", "pyright>=1.1.400"]
+dev = ["pytest>=8.0", "pyright>=1.1.400", "ruff>=0.5.0"]
 
 [project.gui-scripts]
 absorber = "absorber.__main__:main"
 
 [project.urls]
 Homepage = "https://github.com/file-bricks/absorber"
+Repository = "https://github.com/file-bricks/absorber"
 Issues = "https://github.com/file-bricks/absorber/issues"
+Changelog = "https://github.com/file-bricks/absorber/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 include = ["absorber*"]
@@ -39,3 +42,11 @@ include = ["absorber*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "C4", "UP"]
+ignore = ["E501"]

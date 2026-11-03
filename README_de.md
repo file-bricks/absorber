@@ -153,7 +153,7 @@ pip install -e ".[dev]"
 QT_QPA_PLATFORM=offscreen pytest
 ```
 
-115 Tests, ohne Netzzugriff und ohne echte Zwischenablage. Der Kern ist bewusst frei von
+119 Tests, ohne Netzzugriff und ohne echte Zwischenablage. Der Kern ist bewusst frei von
 GUI-Importen:
 
 | Modul | Zuständigkeit |
