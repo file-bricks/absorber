@@ -6,6 +6,11 @@ die Versionierung [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Behoben / Abgesichert
+- Konfigurationsdatei (`config.json`) und Recent-Liste (`recent.json`) schreiben jetzt threadsicher mit Reentrant-Pfadlock, eindeutigen Staging-Dateien (`tempfile.mkstemp`), Symlink-/Verzeichnisziel-Schutz, Fehler-Cleanup und Windows-Sharing-Retry ohne feste `.json.tmp`-Datei.
+- `prune_virtual()` prüft vor dem Löschen via `lstat` Eigentum und reguläre Verzeichnis-/Dateistruktur (keine Symlinks/Reparse-Points, keine aktiven `.tmp`-Staging-Dateien, keine Hardlinks, Nutzer-UID-Abgleich auf POSIX).
+- Im Modus `virtual` wird bei kopierten Dateien ausschließlich auf dem neuen Ziel im virtuellen Ordner die Absorptionszeit gesetzt, sodass frisch aufgenommene ältere Dateien ihre volle `virtual_retention_days`-Aufbewahrungszeit behalten, während `copy2` die Quellzeit im Dauerziel unverändert übernimmt.
+
 ## [0.1.1] - 2026-10-13
 
 ### Behoben

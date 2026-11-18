@@ -9,13 +9,14 @@ from __future__ import annotations
 
 import os
 import shutil
-import stat
 import sys
 import tempfile
 from collections.abc import Callable
 from pathlib import Path
 
 from . import config as config_module
+from ._fs import owned_regular_file, refresh_owned_mtime
+from ._fs import remove_owned as _remove_owned_file
 from .naming import build_stem
 
 #: Content kinds, in the order they are probed.
@@ -55,7 +56,7 @@ def materialize(mime, cfg: dict, namer=None) -> list[Path]:
     target = config_module.resolve_target_dir(cfg)
 
     if kind == KIND_FILES:
-        return _copy_files(mime, target)
+        return _copy_files(mime, target, virtual=(cfg.get("mode") == "virtual"))
 
     sample = mime.text() if mime.hasText() else ""
     stem = build_stem(kind, sample, namer)
@@ -75,7 +76,7 @@ def materialize(mime, cfg: dict, namer=None) -> list[Path]:
                           lambda stage: stage.write_text(mime.text(), encoding="utf-8"))]
 
 
-def _copy_files(mime, target: Path) -> list[Path]:
+def _copy_files(mime, target: Path, *, virtual: bool = False) -> list[Path]:
     written = []
     for url in mime.urls():
         source = url.toLocalFile()
@@ -84,32 +85,26 @@ def _copy_files(mime, target: Path) -> list[Path]:
         source_path = Path(source)
         if not source_path.is_file():
             continue  # directories are out of scope for the MVP
-        destination = _write_unique(target, source_path.stem, source_path.suffix,
-                                    lambda stage, source=source_path: shutil.copy2(source, stage))
+
+        def copy_entry(stage: Path, source: Path = source_path) -> None:
+            stage_identity = stage.lstat()
+            shutil.copy2(source, stage)
+            if virtual:
+                # Copy keeps source metadata in permanent targets, while virtual retention starts at drop time.
+                refresh_owned_mtime(stage, stage_identity)
+
+        destination = _write_unique(target, source_path.stem, source_path.suffix, copy_entry)
         written.append(destination)
     return written
 
 
 def _owned(path: Path, identity: os.stat_result) -> bool:
     """Check the directory entry itself, without following a replacement symlink."""
-    current = path.lstat()
-    return stat.S_ISREG(current.st_mode) and os.path.samestat(current, identity)
+    return owned_regular_file(path, identity)
 
 
 def _remove_owned(path: Path, identity: os.stat_result) -> None:
-    try:
-        if not _owned(path, identity):
-            return
-        try:
-            path.unlink()
-        except PermissionError:
-            # copy2 may copy a readonly attribute to our stage, never to its source.
-            if _owned(path, identity):
-                path.chmod(stat.S_IREAD | stat.S_IWRITE)
-                if _owned(path, identity):
-                    path.unlink()
-    except FileNotFoundError:
-        pass
+    _remove_owned_file(path, identity, owned_check=_owned)
 
 
 def _exclusive_file(path: Path) -> int:

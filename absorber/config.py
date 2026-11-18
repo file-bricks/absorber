@@ -3,7 +3,18 @@
 from __future__ import annotations
 
 import json
+import os
+import stat
+import time
 from pathlib import Path
+
+from ._fs import (
+    is_owned_by_current_user,
+    is_reparse_or_symlink,
+    path_lock,
+    remove_owned,
+    write_json_atomic,
+)
 
 APP_NAME = "absorber"
 
@@ -60,7 +71,8 @@ def load(path: Path | None = None) -> dict:
     path = path or config_path()
     cfg = dict(DEFAULTS)
     try:
-        stored = json.loads(path.read_text(encoding="utf-8"))
+        with path_lock(path):
+            stored = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return cfg
     if isinstance(stored, dict):
@@ -70,11 +82,7 @@ def load(path: Path | None = None) -> dict:
 
 def save(cfg: dict, path: Path | None = None) -> Path:
     path = path or config_path()
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(cfg, indent=2, ensure_ascii=False), encoding="utf-8")
-    tmp.replace(path)
-    return path
+    return write_json_atomic(path, cfg)
 
 
 def resolve_target_dir(cfg: dict) -> Path:
@@ -97,20 +105,43 @@ def text_extension(cfg: dict) -> str:
     return "txt"  # never leave the user without a place to put text
 
 
-def prune_virtual(cfg: dict, now: float | None = None) -> list[Path]:
-    """Delete files in the virtual folder older than virtual_retention_days."""
-    import time
+def _is_owned_virtual_file(item: Path, item_stat: os.stat_result) -> bool:
+    if item.name.startswith(".") and item.name.endswith(".tmp"):
+        return False
+    return (
+        not is_reparse_or_symlink(item_stat)
+        and stat.S_ISREG(item_stat.st_mode)
+        and is_owned_by_current_user(item_stat)
+        and item_stat.st_nlink == 1
+    )
 
+
+def prune_virtual(cfg: dict, now: float | None = None) -> list[Path]:
+    """Delete owned regular files in the virtual folder older than virtual_retention_days."""
     days = int(cfg.get("virtual_retention_days", 7))
     folder = virtual_dir()
-    if days <= 0 or not folder.is_dir():
+    if days <= 0:
+        return []
+    try:
+        folder_stat = folder.lstat()
+    except OSError:
+        return []
+    if (
+        is_reparse_or_symlink(folder_stat)
+        or not stat.S_ISDIR(folder_stat.st_mode)
+        or not is_owned_by_current_user(folder_stat)
+    ):
         return []
     cutoff = (now if now is not None else time.time()) - days * 86400
     removed = []
     for item in folder.iterdir():
         try:
-            if item.is_file() and item.stat().st_mtime < cutoff:
-                item.unlink()
+            item_stat = item.lstat()
+            if (
+                _is_owned_virtual_file(item, item_stat)
+                and item_stat.st_mtime < cutoff
+                and remove_owned(item, item_stat)
+            ):
                 removed.append(item)
         except OSError:
             continue  # a locked or vanished file is not worth failing the sweep over

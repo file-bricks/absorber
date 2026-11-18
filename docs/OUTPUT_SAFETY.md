@@ -42,5 +42,11 @@ Garantie bei Stromausfall.
 Die Regressionen nutzen synthetische Inhalte, tatsächliche parallele Threads und
 eine native Qt-Bildkodierung. Die GUI-Suite läuft mit der Qt-Plattform `offscreen`;
 sie ist keine Abnahme der echten Windows-Zwischenablage oder des System-Trays.
-Konfigurationsdatei, Recent-Liste und virtuelle Aufbewahrung haben getrennte
-Lebenszyklen und sind nicht Bestandteil dieses Ausgabefixes.
+Konfigurationsdatei (`config.json`) und Recent-Liste (`recent.json`) nutzen nun
+ebenfalls gesperrte, atomare Staging-Schreibvorgänge ohne feste `.json.tmp`-Datei
+und mit Schutz gegen Symlink-/Verzeichnisziele. `prune_virtual()` prüft vor dem
+Löschen per `lstat` die Verzeichnis- und Dateieigentümerschaft (reguläre Dateien
+ohne Symlinks, Reparse-Points, Hardlinks oder aktive `.tmp`-Staging-Dateien); im
+Modus `virtual` zählt die Aufbewahrungszeit kopierter Dateien ab dem
+Absorptionszeitpunkt, während `copy2` in dauerhaften Zielordnern weiterhin die
+Quellzeit übernimmt.
